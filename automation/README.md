@@ -127,7 +127,8 @@ allure generate allure-results --clean
 Visualizar reporte:
 
 ```bash
-npx allure serve allure-results
+Eliminar carpeta de "allure-results" antes de ejecutar las pruebas
+npm run allure
 ```
 
 ---
