@@ -12,9 +12,9 @@ interface ProductRow {
 }
 
 const billsData = readCsv<Bill & { [key: string]: string }>(
-  "automation/data/csv/bills.csv",
+  "data/csv/bills.csv",
 );
-const productsData = readCsv<ProductRow>("automation/data/csv/products.csv");
+const productsData = readCsv<ProductRow>("data/csv/products.csv");
 
 // ---------- Escenarios Outline: Flujo completo de compra ----------
 
