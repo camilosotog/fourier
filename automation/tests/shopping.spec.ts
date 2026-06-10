@@ -4,7 +4,7 @@ import { Bill } from "../interfaces/bill.interface";
 import { Product } from "../interfaces/product.interface";
 import { readCsv } from "../helpers/csv-reader";
 
-// ---------- Datos externos desde CSV ----------
+// Datos externos desde CSV
 interface ProductRow {
   product1: string;
   product2: string;
@@ -16,7 +16,7 @@ const billsData = readCsv<Bill & { [key: string]: string }>(
 );
 const productsData = readCsv<ProductRow>("data/csv/products.csv");
 
-// ---------- Escenarios Outline: Flujo completo de compra ----------
+// Escenarios Outline: Flujo completo de compra 
 
 test.describe("Validación de funciones de compra en demoblaze", () => {
   test.beforeEach(async ({ page }) => {
