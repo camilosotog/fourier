@@ -194,5 +194,9 @@ git push origin feature/new-test
 
 ---
 
+### 8. Environment (.env)
+BASE_URL=https://www.demoblaze.com
+
+
 # Estrategia de Integración con Azure DevOps
 
