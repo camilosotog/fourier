@@ -1,0 +1,316 @@
+{
+  "info": {
+    "_postman_id": "93830ea1-fe41-46a1-949a-c7db938a8397",
+    "name": "JSONPlaceholder - Posts API",
+    "description": "Colección profesional para pruebas de la API de posts de JSONPlaceholder.\nIncluye variables de entorno, pre-request scripts, tests de validación y encadenamiento de respuestas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "4349603",
+    "_collection_link": "https://go.postman.co/collection/4349603-93830ea1-fe41-46a1-949a-c7db938a8397?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "03 - GET Post by ID",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Usar el ID creado en POST si existe y si no usar 1",
+              "const createdId = pm.collectionVariables.get('created_post_id');",
+              "const postId = (createdId && createdId !== '') ? createdId : '1';",
+              "pm.collectionVariables.set('current_post_id', postId);",
+              "",
+              "if (createdId && createdId !== '') {",
+              "    console.log('Usando ID  de POST anterior');",
+              "} else {",
+              "    console.log('usando 1');",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─── TESTS DE VALIDACIÓN ──────────────────────────────────────",
+              "",
+              "pm.test('Status code es 200', () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Tiempo de respuesta < 2000ms', () => {",
+              "    pm.expect(pm.response.responseTime, `Tiempo de respuesta fue ${pm.response.responseTime}ms, se esperaba menos de 2000ms`).to.be.below(2000);",
+              "});",
+              "",
+              "pm.test('El post tiene todos los campos requeridos', () => {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData, 'La respuesta no contiene la propiedad \"id\"').to.have.property('id');",
+              "    pm.expect(jsonData, 'La respuesta no contiene la propiedad \"userId\"').to.have.property('userId');",
+              "    pm.expect(jsonData, 'La respuesta no contiene la propiedad \"title\"').to.have.property('title');",
+              "    pm.expect(jsonData, 'La respuesta no contiene la propiedad \"body\"').to.have.property('body');",
+              "});",
+              "",
+              "pm.test('Campo id no es nulo', () => {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.id, 'El campo \"id\" es null').to.not.be.null;",
+              "    pm.expect(jsonData.id, 'El campo \"id\" es undefined').to.not.be.undefined;",
+              "});",
+              "",
+              "// Guardar título para validación posterior",
+              "const post = pm.response.json();",
+              "pm.collectionVariables.set('last_post_title', post.title);",
+              "console.log('Post obtenido - Título:', post.title);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/posts/{{current_post_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "posts",
+            "{{current_post_id}}"
+          ]
+        },
+        "description": "Obtiene un post específico por ID. Usa el ID encadenado del POST si existe, de lo contrario usa ID 1."
+      },
+      "response": []
+    },
+    {
+      "name": "04 - POST Create Post",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const dynamicTitle = 'test_' + Math.random().toString(36).replace(/[^a-z0-9]/gi, '').slice(0, 5);;\r",
+              "pm.collectionVariables.set('dynamic_post_title', dynamicTitle);\r",
+              "\r",
+              "const timestamp = new Date().toISOString();\r",
+              "pm.collectionVariables.set('request_timestamp', timestamp);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Status 201 Created",
+              "pm.test('Status code es 201 Created', () => {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "// Tiempo de respuesta",
+              "pm.test('Tiempo de respuesta < 3000ms', () => {",
+              "    pm.expect(pm.response.responseTime, `Tiempo de respuesta fue ${pm.response.responseTime}ms, se esperaba menos de 3000ms`).to.be.below(3000);",
+              "});",
+              "",
+              "// datos enviados en la respuesta",
+              "pm.test('Los datos del post se guardaron correctamente', () => {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData, 'La respuesta no contiene la propiedad \"title\"').to.have.property('title');",
+              "    pm.expect(jsonData, 'La respuesta no contiene la propiedad \"body\"').to.have.property('body');",
+              "    pm.expect(jsonData, 'La respuesta no contiene la propiedad \"userId\"').to.have.property('userId');",
+              "});",
+              "",
+              "// userId no es nulo",
+              "pm.test('userId no es nulo', () => {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.userId, 'El campo \"userId\" es null').to.not.be.null;",
+              "});",
+              "",
+              "// Guardar ID para requests siguientes",
+              "const createdPost = pm.response.json();",
+              "pm.collectionVariables.set('created_post_id', String(createdPost.id));",
+              "console.log('ID guardado', createdPost.id);",
+              "console.log('Post creado exitosamente:', JSON.stringify(createdPost));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"{{dynamic_post_title}}\",\n  \"body\": \"registro creado el {{request_timestamp}}\",\n  \"userId\": {{test_user_id}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/posts",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "posts"
+          ]
+        },
+        "description": "Crea un nuevo post. El título se genera dinámicamente con timestamp en el pre-request. El ID retornado se encadena automáticamente para las peticiones PUT y DELETE siguientes."
+      },
+      "response": []
+    },
+    {
+      "name": "07 - DELETE Post",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// ─── TESTS DE VALIDACIÓN ──────────────────────────────────────",
+              "",
+              "pm.test('Status code es 200', () => {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Tiempo de respuesta < 3000ms', () => {",
+              "    pm.expect(pm.response.responseTime, `Tiempo de respuesta fue ${pm.response.responseTime}ms, se esperaba menos de 3000ms`).to.be.below(3000);",
+              "});",
+              "",
+              "pm.test('La respuesta está vacía o es un objeto vacío', () => {",
+              "    const responseText = pm.response.text();",
+              "    const isEmpty = responseText === '{}' || responseText === '' || responseText === 'null';",
+              "    pm.expect(isEmpty, `Se esperaba respuesta vacía pero se recibió: \"${responseText}\"`).to.be.true;",
+              "});",
+              "",
+              "// Limpiar el ID luego de eliminar",
+              "pm.collectionVariables.set('created_post_id', '');",
+              "console.log('variable created_post_id limpiada después del DELETE');",
+              "console.log('Post eliminado exitosamente');"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/posts/{{created_post_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "posts",
+            "{{created_post_id}}"
+          ]
+        },
+        "description": "Elimina el post creado anteriormente usando el ID encadenado. Limpia la variable created_post_id al finalizar."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://jsonplaceholder.typicode.com",
+      "description": "URL base de la API"
+    },
+    {
+      "key": "created_post_id",
+      "value": "",
+      "description": "ID del post creado - se llena automáticamente desde POST"
+    },
+    {
+      "key": "test_user_id",
+      "value": "1",
+      "description": "ID de usuario para filtrar posts"
+    },
+    {
+      "key": "request_timestamp",
+      "value": "",
+      "description": "Timestamp del momento de la petición - se llena en pre-request"
+    },
+    {
+      "key": "total_posts",
+      "value": ""
+    },
+    {
+      "key": "current_post_id",
+      "value": ""
+    },
+    {
+      "key": "last_post_title",
+      "value": ""
+    },
+    {
+      "key": "dynamic_post_title",
+      "value": ""
+    },
+    {
+      "key": "updated_post_title",
+      "value": ""
+    }
+  ]
+}
