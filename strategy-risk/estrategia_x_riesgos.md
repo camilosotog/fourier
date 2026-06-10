@@ -1,5 +1,9 @@
 # Módulo 4 - Estrategia y Gestión de Riesgos
 
+Escenario de negocio: Se planea integrar una nueva pasarela de pagos en una aplicación
+ya existente. El equipo de desarrollo entrega el código con retraso y solo queda una
+ventana de 6 horas para realizar pruebas antes del lanzamiento oficial a producción.
+
 ## 1. Análisis de Riesgos
 
 ### Riesgo 1: Cobros duplicados
